@@ -12,9 +12,7 @@ module.exports = (robot) ->
       robot.http("https://www.frinkiac.com/api/caption?e=#{screen.Episode}&t=#{screen.Timestamp}").get() (err, rs, body) ->
         lines = ''
         captions = JSON.parse(body)
-        res.send JSON.stringify(captions)
         captions.Subtitles.forEach (caption) ->
-          res.send JSON.stringify(caption)
           lines += caption.Content.replace(/[ ]/gi, '+') + '%0A'
         lines = lines.substring(0, lines.length - 3)
         res.send "https://www.frinkiac.com/meme/#{screen.Episode}/#{screen.Timestamp}.jpg?lines=#{lines}"

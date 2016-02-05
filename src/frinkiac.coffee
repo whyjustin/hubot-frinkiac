@@ -16,15 +16,15 @@ format = (captions) ->
       cleanBreak = line.length + word.length >= 15 and ['?', '!', '.', ']', ')'].some((punctuation) -> word.indexOf(punctuation, this.length - punctuation.length) != -1)
       if (cleanBreak)
         line += "#{word}"
-        lines.push(line.trim())
+        lines.push(encodeURIComponent(line.trim()))
         line = ''
       else if (line.length + word.length >= 25)
-        lines.push(line.trim())
+        lines.push(encodeURIComponent(line.trim()))
         line = "#{word} "
       else
         line += "#{word} "
     if (line.length > 0)
-      lines.push(line.trim())
+      lines.push(encodeURIComponent(line.trim()))
   
   return lines.join('%0A')
 

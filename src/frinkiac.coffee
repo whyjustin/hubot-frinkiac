@@ -3,6 +3,33 @@
 # Commands
 #   hubot frinkiac <query> - Display screencap of simpsons scene that matches query
 
+format = (captions, res) ->
+  lines = captions.Subtitles.map((subtitle) -> subtitle.Content)
+  res.send JSON.stringify(lines)
+
+  # If any line is greater than 25 characters, reformat
+  if (lines.some((line) -> line.length > 25))
+    words = lines.join(' ').split(' ')
+    lines = []
+    line = ''
+    words.forEach (word) ->
+      # Shoddy attempt to break lines at sentence end
+      cleanBreak = line.length + word.length >= 15 and ['?', '!', '.', ']', ')'].some((punctuation) -> word.indexOf(punctuation, this.length - punctuation.length) != -1)
+      if (cleanBreak)
+        line += "#{word}"
+        lines.push(line.trim())
+        line = ''
+      else if (line.length + word.length >= 25)
+        lines.push(line.trim())
+        line = "#{word} "
+      else
+        line += "#{word} "
+    if (line.length > 0)
+      lines.push(line.trim())
+  
+  res.send JSON.stringify(lines)
+  return lines.join('%0A')
+
 module.exports = (robot) ->
   robot.respond /frinkiac (.*)/i, (res) ->
     query = res.match[1]
@@ -11,5 +38,5 @@ module.exports = (robot) ->
       screen = screens[0]
       robot.http("https://www.frinkiac.com/api/caption?e=#{screen.Episode}&t=#{screen.Timestamp}").get() (err, rs, body) ->
         captions = JSON.parse(body)
-        lines = captions.Subtitles.map((subtitle) -> subtitle.Content).join('%0A')
+        lines = format captions, res
         res.send "https://www.frinkiac.com/meme/#{screen.Episode}/#{screen.Timestamp}.jpg?lines=#{lines}"

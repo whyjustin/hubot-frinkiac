@@ -3,9 +3,8 @@
 # Commands
 #   hubot frinkiac <query> - Display screencap of simpsons scene that matches query
 
-format = (captions, res) ->
+format = (captions) ->
   lines = captions.Subtitles.map((subtitle) -> subtitle.Content)
-  res.send JSON.stringify(lines)
 
   # If any line is greater than 25 characters, reformat
   if (lines.some((line) -> line.length > 25))
@@ -27,7 +26,6 @@ format = (captions, res) ->
     if (line.length > 0)
       lines.push(line.trim())
   
-  res.send JSON.stringify(lines)
   return lines.join('%0A')
 
 module.exports = (robot) ->
@@ -38,5 +36,5 @@ module.exports = (robot) ->
       screen = screens[0]
       robot.http("https://www.frinkiac.com/api/caption?e=#{screen.Episode}&t=#{screen.Timestamp}").get() (err, rs, body) ->
         captions = JSON.parse(body)
-        lines = format captions, res
+        lines = format captions
         res.send "https://www.frinkiac.com/meme/#{screen.Episode}/#{screen.Timestamp}.jpg?lines=#{lines}"

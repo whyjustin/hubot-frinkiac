@@ -3,6 +3,8 @@
 # Commands
 #   hubot frinkiac <query> - Display screencap of simpsons scene that matches query
 
+bannedChannels = if process.env.HUBOT_BANNED_MEME_CHANNELS? then process.env.HUBOT_BANNED_MEME_CHANNELS.split(',') else undefined
+
 format = (captions) ->
   lines = captions.Subtitles.map((subtitle) -> subtitle.Content)
 
@@ -30,6 +32,9 @@ format = (captions) ->
 
 module.exports = (robot) ->
   robot.respond /frinkiac (.*)/i, (res) ->
+    if (res.message and res.message.room and bannedChannels and bannedChannels.indexOf(res.message.room) != -1)
+      return
+
     query = res.match[1]
     robot.http("https://www.frinkiac.com/api/search?q=#{query}").get() (err, rs, body) ->
       screens = JSON.parse(body)

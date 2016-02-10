@@ -16,17 +16,17 @@ format = (captions) ->
       cleanBreak = line.length + word.length >= 15 and ['?', '!', '.', ']', ')'].some((punctuation) -> word.indexOf(punctuation, this.length - punctuation.length) != -1)
       if (cleanBreak)
         line += "#{word}"
-        lines.push(encodeURIComponent(line.trim()))
+        lines.push(line.trim())
         line = ''
       else if (line.length + word.length >= 25)
-        lines.push(encodeURIComponent(line.trim()))
+        lines.push(line.trim())
         line = "#{word} "
       else
         line += "#{word} "
     if (line.length > 0)
-      lines.push(encodeURIComponent(line.trim()))
+      lines.push(line.trim())
   
-  return lines.join('%0A')
+  return lines.map((line) -> encodeURIComponent(line)).join('%0A')
 
 module.exports = (robot) ->
   robot.respond /frinkiac (.*)/i, (res) ->
